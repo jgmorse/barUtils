@@ -6,7 +6,7 @@ require 'csv'
 
 #tmm = CSV.open('data/TMM_Import_Template.csv', headers:true)
 
-def parse_format(str)
+def parse_format(str, row)
   media =''
   format = ''
   str.match(/\((.*?)\)/) { format = $1 }
@@ -22,13 +22,12 @@ def parse_format(str)
       format = 'Hardcover'
   end
 
-  return [media, format]
+  row['Media'] = media
+  row['Format'] = format
 end
 
-def parse_isbn(str)
-  isbn = ''
-  str.match(/^(\d+)/) { isbn = $1}
-  return isbn
+def parse_isbn(str, row)
+  str.match(/^(\d+)/) { row['ISBN13'] = $1}
 end
 
 def parse_creators(creators, row)
@@ -110,15 +109,13 @@ CSV.open('data/output.csv', 'w') do |output|
     isbns_formats = input['ISBN(s)'].split('; ')
     isbns_formats.each {|i|
       row = CSV::Row.new(header,[])
-      row['ISBN13'] = parse_isbn(i)
+      parse_isbn(i, row)
       row['Title'] = input['Title']
       row['Subtitle'] = input['Sub-Title']
       row['Division'] = input['Copyright Holder']
       row['Imprint'] = 'British Archaeological Reports'
 
-      mediaFormat = parse_format(i)
-      row['Media'] = mediaFormat[0]
-      row['Format'] = mediaFormat[1]
+      parse_format(i, row)
 
       row['Series'] = input['Series']
       row['BISAC Status'] = 'Active'
