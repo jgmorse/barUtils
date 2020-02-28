@@ -49,6 +49,20 @@ def parse_creators(creators, row)
   }
 end
 
+def parse_subseries(row, input)
+  subseries = ''
+  if input['Sub Series']
+    subseries = input['Sub Series']
+  end
+
+  if input['Sub series no']
+    subseries += ' ' + input['Sub series no']
+  end
+
+  row['Sub Series'] = subseries if subseries
+end
+
+
 header = [
   'Bookkey',
   'ISBN13', 'ISBN10', #at least one of these is required
@@ -98,8 +112,14 @@ header = [
   'Book Description Marketing',
   'Keynote',
   'Shopping Cart Link 1',
+  'Open Access Avail.',
+  'OA Funder',
+  'DOI',
   #The following are custom for Bar
-  'Other ID' #BAR Number
+  'Other ID', #BAR Number
+  'Other Subjects',
+  'Sub Series'
+
 ]
 
 CSV.open('data/output.csv', 'w') do |output|
@@ -124,7 +144,18 @@ CSV.open('data/output.csv', 'w') do |output|
 
       parse_creators( input['Creator(s)'], row )
 
+      row['Language'] = 'English'
+
+
       row['Other ID'] = input['BAR Number']
+      row['Other Subjects'] = input['Subject']
+      row['Shopping Cart Link 1'] = input['Buy Book URL']
+      row['Open Access Avail.'] = input['Open Access?']
+      row['OA Funder'] = input['Funder']
+      row['DOI'] = 'https://doi.org/' + input['DOI'] if input['DOI']
+      parse_subseries(row, input)
+
+
       output << row
     }
   end
