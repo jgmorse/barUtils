@@ -79,9 +79,10 @@ header = [
   'All Subjects 5',
   'Book Description Marketing',
   'Keynote',
-  'Shopping Cart Link 1'
+  'Shopping Cart Link 1',
+  #The following are custom for Bar
+  'Other ID' #BAR Number
 ]
-
 
 CSV.open('data/output.csv', 'w') do |output|
   output << header
@@ -90,12 +91,20 @@ CSV.open('data/output.csv', 'w') do |output|
     isbns_formats = input['ISBN(s)'].split('; ')
     isbns_formats.each {|i|
       row = CSV::Row.new(header,[])
-
       row['ISBN13'] = parse_isbn(i)
+      row['Title'] = input['Title']
+      row['Subtitle'] = input['Sub-Title']
+      row['Division'] = input['Copyright Holder']
+      row['Imprint'] = 'British Archaeological Reports'
       mediaFormat = parse_format(i)
       row['Media'] = mediaFormat[0]
       row['Format'] = mediaFormat[1]
-      row['Imprint'] = 'British Archaeological Reports'
+      row['Series'] = input['Series']
+      row['BISAC Status'] = 'Active'
+      row['Pub Date'] = input['Pub Year']
+      input['Pub Year'].match(/^(\d{4})/) {row['Pub Year'] = $1}
+
+      row['Other ID'] = input['BAR Number']
       output << row
     }
   end
