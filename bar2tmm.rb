@@ -31,6 +31,25 @@ def parse_isbn(str)
   return isbn
 end
 
+def parse_creators(creators, row)
+  #Only 4 author slots, so only take the first 4
+  i = 1
+  creators.split('; ').take(4).each { |c|
+    c.match(/^(.+?),/) {row["Author Last #{i}"] = $1}
+    c.match(/, (.+?)(\(|$)/) {row["Author First #{i}"] = $1.strip}
+
+    role = ''
+    c.match(/\((.*?)\)/) {role = $1}
+    if role=='editor'
+      row["Author Role #{i}"] = 'Editor'
+    else
+      row["Author Role #{i}"] = 'Author'
+    end
+
+    i += 1
+  }
+end
+
 header = [
   'Bookkey',
   'ISBN13', 'ISBN10', #at least one of these is required
@@ -96,13 +115,17 @@ CSV.open('data/output.csv', 'w') do |output|
       row['Subtitle'] = input['Sub-Title']
       row['Division'] = input['Copyright Holder']
       row['Imprint'] = 'British Archaeological Reports'
+
       mediaFormat = parse_format(i)
       row['Media'] = mediaFormat[0]
       row['Format'] = mediaFormat[1]
+
       row['Series'] = input['Series']
       row['BISAC Status'] = 'Active'
       row['Pub Date'] = input['Pub Year']
       input['Pub Year'].match(/^(\d{4})/) {row['Pub Year'] = $1}
+
+      parse_creators( input['Creator(s)'], row )
 
       row['Other ID'] = input['BAR Number']
       output << row
