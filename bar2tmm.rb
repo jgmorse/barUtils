@@ -118,8 +118,8 @@ header = [
   #The following are custom for Bar
   'Other ID', #BAR Number
   'Other Subjects',
-  'Sub Series'
-
+  'Sub Series',
+  'Imprint 1'
 ]
 
 CSV.open('data/output.csv', 'w') do |output|
@@ -153,6 +153,7 @@ CSV.open('data/output.csv', 'w') do |output|
       row['Open Access Avail.'] = input['Open Access?']
       row['OA Funder'] = input['Funder']
       row['DOI'] = 'https://doi.org/' + input['DOI'] if input['DOI']
+      row['Imprint 1'] = input['Pub Location']
       parse_subseries(row, input)
 
 
