@@ -119,7 +119,8 @@ header = [
   'Other ID', #BAR Number
   'Other Subjects',
   'Sub Series',
-  'Imprint 1'
+  'Imprint 1',
+  'Fulcrum Products'
 ]
 
 CSV.open('data/output.csv', 'w') do |output|
