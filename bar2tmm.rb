@@ -6,6 +6,30 @@ require 'csv'
 
 #tmm = CSV.open('data/TMM_Import_Template.csv', headers:true)
 
+# IMPORTANT : because this relies on processing already done in the current row,
+# THIS SHOULD BE THE LAST SUBROUTINE CALLED IN MAIN!!!!!
+def assign_products(row, input)
+  products = []
+  base = ''
+
+  if( row['Pub Year'].to_i < 2020 )
+    base = 'bar_pre2020_collection'
+    products.push base
+  else
+    #stub for years 2020 and later, TBD
+  end
+
+  case row['Series']
+  when 'BAR British Series'
+    products.push base+='_brit'
+  when 'BAR International Series'
+    products.push base+='_int'
+  end
+
+  row['Fulcrum Products'] = products.join(';')
+
+end
+
 def parse_format(str, row)
   media =''
   format = ''
@@ -120,7 +144,8 @@ header = [
   'Other Subjects',
   'Sub Series',
   'Imprint 1',
-  'Fulcrum Products'
+  'Fulcrum Products',
+  'Publisher'
 ]
 
 CSV.open('data/output.csv', 'w') do |output|
@@ -135,6 +160,7 @@ CSV.open('data/output.csv', 'w') do |output|
       row['Subtitle'] = input['Sub-Title']
       row['Division'] = input['Copyright Holder']
       row['Imprint'] = 'British Archaeological Reports'
+      row['Publisher'] = 'Fulcrum Hosted Clients'
 
       parse_format(i, row)
 
@@ -156,6 +182,7 @@ CSV.open('data/output.csv', 'w') do |output|
       row['DOI'] = 'https://doi.org/' + input['DOI'] if input['DOI']
       row['Imprint 1'] = input['Pub Location']
       parse_subseries(row, input)
+      assign_products(row, input)
 
 
       output << row
