@@ -3,21 +3,22 @@
 #get path to input file (or pipe) from ARGV.shift
 
 require 'csv'
+require 'Date'
 
 #tmm = CSV.open('data/TMM_Import_Template.csv', headers:true)
 
 # IMPORTANT : because this relies on processing already done in the current row,
 # THIS SHOULD BE THE LAST SUBROUTINE CALLED IN MAIN!!!!!
-def assign_products(row, input)
+def assign_products(row, pubYear)
   products = []
   base = ''
 
-  if( row['Pub Year'].to_i < 2020 )
+  if( pubYear < 2020 )
     base = 'bar_pre2020_collection'
-    products.push base
   else
-    #stub for years 2020 and later, TBD
+    base = "bar_#{pubYear}_annual"
   end
+  products.push base
 
   case row['Series']
   when 'BAR British Series'
@@ -106,7 +107,7 @@ header = [
   'Series',
   'BISAC Status',
   'Discount',
-  'Pub Date',
+  'Pub Date', #MM/DD/YYYY
   'Pub Year',
   'Acq Editor',
   'Price',
@@ -166,8 +167,11 @@ CSV.open('data/output.csv', 'w') do |output|
 
       row['Series'] = input['Series']
       row['BISAC Status'] = 'Active'
-      row['Pub Date'] = input['Pub Year']
-      input['Pub Year'].match(/^(\d{4})/) {row['Pub Year'] = $1}
+
+      #parse European-format date
+      pubDate = Date.strptime(input['Pub Date'].strip, "%d/%m/%Y")
+      row['Pub Date'] = pubDate.strftime('%m/%d/%Y')
+      row['Pub Year'] = pubDate.year
 
       parse_creators( input['Creator(s)'], row )
 
@@ -182,7 +186,7 @@ CSV.open('data/output.csv', 'w') do |output|
       row['DOI'] = 'https://doi.org/' + input['DOI'] if input['DOI']
       row['Imprint 1'] = input['Pub Location']
       parse_subseries(row, input)
-      assign_products(row, input)
+      assign_products(row, pubDate.year)
 
 
       output << row
