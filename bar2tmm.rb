@@ -84,7 +84,7 @@ def parse_subseries(row, input)
     subseries += ' ' + input['Sub series no']
   end
 
-  row['Sub Series'] = subseries if subseries
+  row['FulcrumPartnerSeries'] += ":#{subseries}" if subseries
 end
 
 
@@ -104,7 +104,7 @@ header = [
   'Trim Width',
   'Trim Length',
   'Insert/Illustrations',
-  'Series',
+  'FulcrumPartnerSeries',
   'BISAC Status',
   'Discount',
   'Pub Date', #MM/DD/YYYY
@@ -143,7 +143,6 @@ header = [
   #The following are custom for Bar
   'Other ID', #BAR Number
   'Other Subjects',
-  'Sub Series',
   'Imprint 1',
   'Fulcrum Products',
   'Publisher'
