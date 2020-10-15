@@ -9,7 +9,7 @@ require 'Date'
 
 # IMPORTANT : because this relies on processing already done in the current row,
 # THIS SHOULD BE THE LAST SUBROUTINE CALLED IN MAIN!!!!!
-def assign_products(row, pubYear)
+def assign_products(row, input, pubYear)
   products = []
   base = ''
 
@@ -20,7 +20,7 @@ def assign_products(row, pubYear)
   end
   products.push base
 
-  case row['Series']
+  case input['Series']
   when 'BAR British Series'
     products.push base+='_brit'
   when 'BAR International Series'
@@ -55,8 +55,12 @@ def parse_format(str, row)
   row['Format'] = format
 end
 
-def parse_isbn(str, row)
-  str.match(/^(\d+)/) { row['ISBN13'] = $1}
+def parse_isbn(str, row, all_isbns_formats)
+  isbn = ''
+  str.match(/^(\d+)/) { isbn = $1}
+  row['ISBN13'] = isbn
+  #child_isbn_format = all_isbns_formats.delete(isbn).shift
+  #child_isbn_format.match(/^(\d+)/) { row['ChildISBN'] = $1}
 end
 
 def parse_creators(creators, row)
@@ -78,17 +82,17 @@ def parse_creators(creators, row)
   }
 end
 
-def parse_subseries(row, input)
-  subseries = ''
+def parse_series(row, input)
+  series = input['Series']
   if input['Sub Series']
-    subseries = input['Sub Series']
+    series +=  ":" + input['Sub Series']
   end
 
   if input['Sub series no']
-    subseries += ' ' + input['Sub series no']
+    series += ' ' + input['Sub series no']
   end
 
-  row['FulcrumPartnerSeries'] += ":#{subseries}" if subseries
+  row['FulcrumPartnerSeries'] = series
 end
 
 
@@ -165,7 +169,7 @@ CSV.open('data/output.csv', 'w') do |output|
     isbns_formats = input['ISBN(s)'].split('; ')
     isbns_formats.each {|i|
       row = CSV::Row.new(header,[])
-      parse_isbn(i, row)
+      parse_isbn(i, row, isbns_formats)
       row['Title'] = input['Title']
       row['Subtitle'] = input['Sub-Title']
       row['grouplevel1'] = 'Michigan Publishing'
@@ -175,11 +179,11 @@ CSV.open('data/output.csv', 'w') do |output|
 
       parse_format(i, row)
 
-      row['Series'] = input['Series']
+
       row['BISAC Status'] = 'Active'
 
       #parse European-format date
-      pubDate = Date.strptime(input['Pub Date'].strip, "%d/%m/%Y")
+      pubDate = Date.strptime(input['Pub Date'].strip, "%m/%d/%Y")
       row['Pub Date'] = pubDate.strftime('%m/%d/%Y')
       row['Pub Year'] = pubDate.year
 
@@ -195,8 +199,8 @@ CSV.open('data/output.csv', 'w') do |output|
       row['OA Funder'] = input['Funder']
       row['DOI'] = 'https://doi.org/' + input['DOI'] if input['DOI']
       row['grouplevel3 1'] = input['Pub Location']
-      parse_subseries(row, input)
-      assign_products(row, pubDate.year)
+      parse_series(row, input)
+      assign_products(row, input, pubDate.year)
 
 
       output << row
