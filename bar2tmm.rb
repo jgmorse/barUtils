@@ -27,7 +27,11 @@ def assign_products(row, pubYear)
     products.push base+='_int'
   end
 
-  row['Fulcrum Products'] = products.join(';')
+  i = 1
+  products.each { |p|
+    row["Fulcrum Product #{i}"] = p
+    i += 1
+  }
 
 end
 
@@ -92,6 +96,7 @@ header = [
   'Bookkey',
   'ISBN13', 'ISBN10', #at least one of these is required
   'Primary ISBN13',
+  'ChildISBN',
   'Title Prefix',
   'Title',            #required
   'Short Title',
@@ -100,7 +105,8 @@ header = [
   'grouplevel2',      #required (Division)
   'grouplevel3',      #required (Imprint)
   'Media',            #required
-  'Format',           #required
+  'Format',
+  'ChildFormat',          #required
   'Page Count',
   'Trim Width',
   'Trim Length',
@@ -145,7 +151,10 @@ header = [
   'Other ID', #BAR Number
   'Other Subjects',
   'Imprint 1',
-  'Fulcrum Products',
+  'Fulcrum Product 1',
+  'Fulcrum Product 2',
+  'Fulcrum Product 3',
+  'Fulcrum Product 4',
   'Publisher'
 ]
 
