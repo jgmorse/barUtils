@@ -59,15 +59,15 @@ def parse_creators(creators, row)
   #Only 4 author slots, so only take the first 4
   i = 1
   creators.split('; ').take(4).each { |c|
-    c.match(/^(.+?),/) {row["Author Last #{i}"] = $1}
-    c.match(/, (.+?)(\(|$)/) {row["Author First #{i}"] = $1.strip}
+    c.match(/^(.+?),/) {row["authorlastname#{i}"] = $1}
+    c.match(/, (.+?)(\(|$)/) {row["authorfirstname#{i}"] = $1.strip}
 
     role = ''
     c.match(/\((.*?)\)/) {role = $1}
     if role=='editor'
-      row["Author Role #{i}"] = 'Editor'
+      row["authortype#{i}"] = 'Editor'
     else
-      row["Author Role #{i}"] = 'Author'
+      row["authortype#{i}"] = 'Author'
     end
 
     i += 1
@@ -96,8 +96,9 @@ header = [
   'Title',            #required
   'Short Title',
   'Subtitle',
-  'Division',         #required
-  'Imprint',          #required
+  'grouplevel1',
+  'grouplevel2',      #required (Division)
+  'grouplevel3',      #required (Imprint)
   'Media',            #required
   'Format',           #required
   'Page Count',
@@ -112,18 +113,18 @@ header = [
   'Acq Editor',
   'Price',
   'Price Effective',
-  'Author First 1',
-  'Author Last 1',
-  'Author Role 1',
-  'Author First 2',
-  'Author Last 2',
-  'Author Role 2',
-  'Author First 3',
-  'Author Last 3',
-  'Author Role 3',
-  'Author First 4',
-  'Author Last 4',
-  'Author Role 4',
+  'authorfirstname1',
+  'authorlastname1',
+  'authortype1',
+  'authorfirstname2',
+  'authorlastname2',
+  'authortype2',
+  'authorfirstname3',
+  'authorlastname3',
+  'authortype3',
+  'authorfirstname4',
+  'authorlastname4',
+  'authortype4',
   'Author Bio',
   'Language',
   'Audience',
@@ -158,8 +159,9 @@ CSV.open('data/output.csv', 'w') do |output|
       parse_isbn(i, row)
       row['Title'] = input['Title']
       row['Subtitle'] = input['Sub-Title']
-      row['Division'] = input['Copyright Holder']
-      row['Imprint'] = 'British Archaeological Reports'
+      row['grouplevel1'] = 'Michigan Publishing'
+      row['grouplevel2'] = input['Copyright Holder']
+      row['grouplevel3'] = 'British Archaeological Reports'
       row['Publisher'] = 'Fulcrum Hosted Clients'
 
       parse_format(i, row)
@@ -183,7 +185,7 @@ CSV.open('data/output.csv', 'w') do |output|
       row['Open Access Avail.'] = input['Open Access?']
       row['OA Funder'] = input['Funder']
       row['DOI'] = 'https://doi.org/' + input['DOI'] if input['DOI']
-      row['Imprint 1'] = input['Pub Location']
+      row['grouplevel3 1'] = input['Pub Location']
       parse_subseries(row, input)
       assign_products(row, pubDate.year)
 
