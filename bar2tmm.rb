@@ -206,6 +206,7 @@ CSV.open('data/output.csv', 'w') do |output|
 
       row['Language'] = 'English'
       row['Author Bio'] = input['Author Blurb']
+      row['Book Description Marketing'] = input['Description']
 
       row['Other ID'] = input['BAR Number']
       row['Other Subjects'] = input['Subject']
