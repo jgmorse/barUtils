@@ -99,16 +99,13 @@ def parse_creators(creators, row)
 end
 
 def parse_series(row, input)
-  series = input['Series']
   if input['Sub Series']
-    series +=  ":" + input['Sub Series']
+    series = input['Sub Series']
+    if input['Sub series no']
+      series += ' ' + input['Sub series no']
+    end
+    row['FulcrumPartnerSeries'] = series
   end
-
-  if input['Sub series no']
-    series += ' ' + input['Sub series no']
-  end
-
-  row['FulcrumPartnerSeries'] = series
 end
 
 
