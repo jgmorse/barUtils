@@ -2,12 +2,20 @@ GEM
   remote: https://rubygems.org/
   specs:
     isbn (2.0.11)
+    mini_portile2 (2.8.0)
+    nokogiri (1.13.9)
+      mini_portile2 (~> 2.8.0)
+      racc (~> 1.4)
+    racc (1.6.0)
+    slop (4.9.3)
 
 PLATFORMS
   ruby
 
 DEPENDENCIES
   isbn
+  nokogiri
+  slop
 
 BUNDLED WITH
    2.1.4
