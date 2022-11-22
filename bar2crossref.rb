@@ -8,6 +8,28 @@ require 'isbn'
 require 'slop'
 require 'nokogiri'
 
+def parse_format(str)
+  media =''
+  format = ''
+  str.match(/\((.*?)\)/) { format = $1 }
+  case format
+  when /ebook/i
+      media = 'Ebook Format'
+      format = 'All Ebooks'
+      crossref = 'electronic'
+  when /paper/i
+      media = 'Book'
+      format = 'Paperback'
+      crossref = 'print'
+  when /hard/i
+      media = 'Book'
+      format = 'Hardcover'
+      crossref = 'print'
+  end
+
+  return [media, format, crossref]
+end
+
 begin
   opts = Slop.parse strict: true do |opt|
     opt.string '-f', '--file', 'Input exported csv from TMM'
@@ -41,6 +63,16 @@ base_url = "https://www.fulcrum.org"
               xml.titles {
                 xml.title input['Title']
                 xml.subtitle input['Sub-Title']
+              }
+              xml.publication_date {
+                xml.year input['Pub Date'].gsub(/^\d\d?\/\d\d?\//, '')
+              }
+              isbns_formats = input['ISBN(s)'].split('; ')
+              isbns_formats.each {|i|
+                isbn = ''
+                i.match(/^ ?(\d+)/) { isbn = $1}
+                m_f = parse_format(i)
+                xml.isbn isbn
               }
               xml.publisher {
                 xml.publisher_name input['Publisher']
