@@ -58,7 +58,7 @@ end
 def parse_isbn_format(this_isbn_format, row, all_isbns_formats)
   #Get the isbn for this row
   isbn = ''
-  this_isbn_format.match(/^(\d+)/) { isbn = $1}
+  this_isbn_format.match(/^ ?(\d+)/) { isbn = $1}
   # Change ISBN13 column to be the 10 digit ISBN with dashes -- as per jvanderw
   row['ISBN13'] = ISBN.with_dashes( ISBN.ten(isbn) )
   row['ISBN10'] = ISBN.ten(isbn)
@@ -73,7 +73,7 @@ def parse_isbn_format(this_isbn_format, row, all_isbns_formats)
   copy = all_isbns_formats.slice(0 .. -1)
   copy.delete(this_isbn_format)
   child_isbn_format = copy.shift
-  child_isbn_format.match(/^(\d+)/) { row['ChildISBN'] = $1}
+  child_isbn_format.match(/^ ?(\d+)/) { row['ChildISBN'] = $1}
   m_f = parse_format(child_isbn_format)
   row['ChildMedia'] = m_f[0]
   row['ChildFormat'] = m_f[1]
@@ -183,7 +183,7 @@ CSV.open('data/output.csv', 'w') do |output|
   output << header
   CSV.foreach(ARGV.shift, headers: true) do |input|
     #e.g. 9781407333977 (ebook); 9781407303697 (paperback)
-    isbns_formats = input['ISBN(s)'].split('; ')
+    isbns_formats = input['ISBN(s)'].split(';')
     isbns_formats.each {|i|
       row = CSV::Row.new(header,[])
       parse_isbn_format(i, row, isbns_formats)
