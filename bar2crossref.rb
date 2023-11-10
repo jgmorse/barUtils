@@ -65,7 +65,7 @@ base_url = "https://www.fulcrum.org"
                 xml.subtitle input['Sub-Title']
               }
               xml.publication_date {
-                xml.year input['Pub Date'].gsub(/^\d\d?\/\d\d?\//, '')
+                xml.year input['Pub Year'].gsub(/^\d\d?\/\d\d?\//, '')
               }
               isbns_formats = input['ISBN(s)'].split('; ')
               isbns_formats.each {|i|
@@ -80,7 +80,7 @@ base_url = "https://www.fulcrum.org"
               }
               xml.doi_data {
                 xml.doi input['DOI']
-                xml.resource input['Resource']
+                xml.resource input['Link']
               }
             }
           }
